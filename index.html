@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>KidEdu Studio - Belajar & Bermain Islami</title>
+    
+    <!-- PWA Manifest Inline Data -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"KidEdu Studio","short_name":"KidEdu","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#4f46e5","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3426/3426653.png","sizes":"192x192","type":"image/png"}]}'>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Amiri:wght@400;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+        .font-arabic {
+            font-family: 'Amiri', serif;
+        }
+        .bg-kids-pattern {
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px), radial-gradient(#cbd5e1 1.5px, #f8fafc 1.5px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+        .btn-bounce {
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.12s ease;
+            touch-action: manipulation;
+        }
+        .btn-bounce:active {
+            transform: scale(0.92);
+        }
+        .card-pop {
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .wiggle {
+            animation: wiggle 2.5s infinite ease-in-out;
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        /* Mobile Safe Area Padding */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top, 0.5rem);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen flex justify-center items-center p-0 md:p-4 overflow-x-hidden">
+
+    <!-- Mobile Device Container Frame -->
+    <div class="w-full max-w-md h-screen md:h-[92vh] md:max-h-[900px] bg-kids-pattern flex flex-col justify-between md:rounded-[2.5rem] md:border-[8px] md:border-slate-700 shadow-2xl overflow-hidden relative border-box">
+
+        <!-- Top App Bar -->
+        <header class="bg-white/95 backdrop-blur-md shadow-sm border-b-2 border-emerald-200 sticky top-0 z-40 px-4 py-2.5 pt-safe flex items-center justify-between">
+            <!-- App Logo / Title -->
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="navigateTo('home')">
+                <div class="bg-gradient-to-tr from-emerald-500 to-teal-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-md wiggle">
+                    <i class="fa-solid fa-kaaba text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-emerald-600 tracking-tight leading-none">KidEdu <span class="text-amber-500">Islami</span></h1>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-wider">BELAJAR & BERMAIN</p>
+                </div>
+            </div>
+
+            <!-- Profile & Controls -->
+            <div class="flex items-center space-x-2">
+                <!-- PWA Install Button (Conditional) -->
+                <button id="pwa-install-btn" onclick="installPWA()" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 btn-bounce">
+                    <i class="fa-solid fa-download text-emerald-600"></i> App
+                </button>
+
+                <!-- Stars Counter -->
+                <div class="bg-amber-100 border border-amber-300 text-amber-700 px-3 py-1 rounded-full flex items-center shadow-inner space-x-1.5 font-extrabold text-sm">
+                    <i class="fa-solid fa-star text-yellow-500 animate-pulse"></i>
+                    <span id="star-count-display">0</span>
+                </div>
+
+                <!-- Profile Button -->
+                <button onclick="openProfileModal()" class="w-9 h-9 rounded-full bg-indigo-100 border-2 border-indigo-300 flex items-center justify-center text-xl btn-bounce">
+                    <span id="nav-avatar">🦁</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 space-y-5 pb-24">
+
+            <!-- ================= HOME VIEW ================= -->
+            <section id="view-home" class="space-y-4 card-pop">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden flex items-center justify-between">
+                    <div class="z-10 space-y-1 max-w-[65%]">
+                        <span class="bg-white/20 text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full">Assalamu'alaikum! 👋</span>
+                        <h2 class="text-xl font-extrabold leading-tight">Halo, <span id="home-user-name">Adik Pintar</span>!</h2>
+                        <p class="text-emerald-100 text-xs font-medium">Yuk belajar agama & ilmu umum sambil mengumpulkan bintang!</p>
+                    </div>
+                    <div class="z-10 flex-shrink-0">
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white/40 shadow-inner wiggle">
+                            <span id="hero-avatar-display" class="text-4xl">🦁</span>
+                        </div>
+                    </div>
+                    <!-- Background shapes -->
+                    <div class="absolute -top-8 -left-8 w-28 h-28 bg-white/10 rounded-full blur-lg"></div>
+                </div>
+
+                <!-- Modul Islami Header Badge -->
+                <div class="flex items-center justify-between pt-1">
+                    <h3 class="text-sm font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-moon text-emerald-500"></i> Modul Islami Dasar
+                    </h3>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold">Spesial</span>
+                </div>
+
+                <!-- Islamic Categories Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Modul 1: Hijaiyah -->
+                    <div onclick="navigateTo('hijaiyah')" class="bg-white border-2 border-emerald-200 hover:border-emerald-400 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer btn-bounce flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl font-arabic font-bold mb-2 group-hover:scale-110 transition">
+                            أ ب t
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Huruf Hijaiyah</h4>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Alif - Ya & Harakat</p>
+                    </div>
+
+                    <!-- Modul 2: Doa Harian -->
+                    <div onclick="navigateTo('doa')" class="bg-white border-2 border-teal-200 hover:border-teal-400 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer btn-bounce flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600 text-2xl mb-2 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-hands-praying"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Doa-Doa Harian</h4>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Doa Makan, Tidur, dll</p>
+                    </div>
+
+                    <!-- Modul 3: Rukun Islam & Iman -->
+                    <div onclick="navigateTo('rukun')" class="bg-white border-2 border-amber-200 hover:border-amber-400 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer btn-bounce flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 text-2xl mb-2 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-star-and-crescent"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Rukun Islam & Iman</h4>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Mengenal Pondasi Agama</p>
+                    </div>
+
+                    <!-- Modul 4: Wudhu & Shalat -->
+                    <div onclick="navigateTo('ibadah')" class="bg-white border-2 border-sky-200 hover:border-sky-400 rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer btn-bounce flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-600 text-2xl mb-2 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-person-praying"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Wudhu & Shalat</h4>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Panduan Langkah Bergambar</p>
+                    </div>
+                </div>
+
+                <!-- Modul Umum Header Badge -->
+                <div class="flex items-center justify-between pt-2">
+                    <h3 class="text-sm font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-shapes text-indigo-500"></i> Modul Umum & Belajar
+                    </h3>
+                </div>
+
+                <!-- General Categories Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Abjad -->
+                    <div onclick="navigateTo('alphabet')" class="bg-white border-2 border-rose-200 hover:border-rose-400 rounded-2xl p-3.5 shadow-sm transition cursor-pointer btn-bounce flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-500 text-xl font-bold">A</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Abjad A-Z</h4>
+                            <p class="text-[10px] text-slate-400">Kata & Gambar</p>
+                        </div>
+                    </div>
+
+                    <!-- Angka -->
+                    <div onclick="navigateTo('numbers')" class="bg-white border-2 border-yellow-200 hover:border-yellow-400 rounded-2xl p-3.5 shadow-sm transition cursor-pointer btn-bounce flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600 text-xl font-bold">123</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Angka Hitung</h4>
+                            <p class="text-[10px] text-slate-400">1 - 20 & Game</p>
+                        </div>
+                    </div>
+
+                    <!-- Warna & Bentuk -->
+                    <div onclick="navigateTo('shapes')" class="bg-white border-2 border-indigo-200 hover:border-indigo-400 rounded-2xl p-3.5 shadow-sm transition cursor-pointer btn-bounce flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-500 text-xl"><i class="fa-solid fa-palette"></i></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Warna & Bentuk</h4>
+                            <p class="text-[10px] text-slate-400">Geometri Dasar</p>
+                        </div>
+                    </div>
+
+                    <!-- Kuis Seru -->
+                    <div onclick="navigateTo('quiz')" class="bg-white border-2 border-purple-200 hover:border-purple-400 rounded-2xl p-3.5 shadow-sm transition cursor-pointer btn-bounce flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-purple-500 text-xl"><i class="fa-solid fa-gamepad"></i></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Kuis Pintar</h4>
+                            <p class="text-[10px] text-slate-400">Kumpul Bintang</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= HIJAIYAH VIEW ================= -->
+            <section id="view-hijaiyah" class="hidden space-y-4 card-pop">
+                <!-- Top Nav -->
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-emerald-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-quran"></i> Huruf Hijaiyah
+                    </h2>
+                    <div></div>
+                </div>
+
+                <!-- Main Display Card -->
+                <div class="bg-white border-4 border-emerald-300 rounded-3xl p-5 shadow-md flex flex-col items-center text-center space-y-3">
+                    <!-- Harakat Switcher Buttons -->
+                    <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs font-bold">
+                        <button id="btn-harakat-fathah" onclick="setHarakat('a')" class="px-3 py-1 rounded-xl bg-emerald-500 text-white shadow btn-bounce">Fathah (A)</button>
+                        <button id="btn-harakat-kasrah" onclick="setHarakat('i')" class="px-3 py-1 rounded-xl bg-slate-200 text-slate-600 btn-bounce">Kasrah (I)</button>
+                        <button id="btn-harakat-dammah" onclick="setHarakat('u')" class="px-3 py-1 rounded-xl bg-slate-200 text-slate-600 btn-bounce">Dammah (U)</button>
+                    </div>
+
+                    <!-- Big Letter Card -->
+                    <div onclick="speakCurrentHijaiyah()" class="w-36 h-36 bg-gradient-to-tr from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center text-white text-7xl font-arabic font-bold shadow-lg cursor-pointer btn-bounce hover:ring-4 ring-emerald-200 transition">
+                        <span id="hijaiyah-big-display">أَ</span>
+                    </div>
+
+                    <!-- Info & Word example -->
+                    <div class="space-y-1">
+                        <p id="hijaiyah-latin-name" class="text-xl font-extrabold text-slate-800">Alif (A)</p>
+                        <p class="text-xs text-slate-500 font-bold">Contoh Kata: <span id="hijaiyah-example-word" class="text-emerald-600 font-extrabold">أَنَانَاس (Ananas / Nanas)</span></p>
+                    </div>
+
+                    <button onclick="speakCurrentHijaiyah()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-2xl font-bold text-sm shadow btn-bounce flex items-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i> Bunyi Suara
+                    </button>
+                </div>
+
+                <!-- Hijaiyah Selector Grid -->
+                <div class="bg-white border-2 border-slate-200 p-3 rounded-2xl shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 mb-2 text-center uppercase">Pilih Huruf Hijaiyah:</p>
+                    <div id="hijaiyah-grid" class="grid grid-cols-5 gap-2 dir-rtl">
+                        <!-- Dynamic Hijaiyah Buttons -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= DOA HARIAN VIEW ================= -->
+            <section id="view-doa" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-teal-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-hands-praying"></i> Doa-Doa Harian
+                    </h2>
+                    <div></div>
+                </div>
+
+                <!-- Doa Selector List -->
+                <div id="doa-selector-list" class="flex gap-2 overflow-x-auto pb-1">
+                    <!-- Dynamic Doa Pills -->
+                </div>
+
+                <!-- Doa Display Card -->
+                <div class="bg-white border-4 border-teal-300 rounded-3xl p-5 shadow-md space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 id="doa-title" class="text-lg font-extrabold text-teal-700">Doa Sebelum Makan</h3>
+                        <span id="doa-icon-display" class="text-2xl">🍽️</span>
+                    </div>
+
+                    <!-- Arabic Text -->
+                    <div class="bg-teal-50/60 p-4 rounded-2xl border border-teal-100 text-center">
+                        <p id="doa-arabic" class="text-2xl md:text-3xl font-arabic font-bold text-slate-800 leading-loose">
+                            اَللّٰهُمَّ بَارِكْ لَنَا فِيْمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ
+                        </p>
+                    </div>
+
+                    <!-- Latin -->
+                    <p id="doa-latin" class="text-xs font-bold text-teal-600 italic text-center">
+                        "Allahumma baarik lanaa fii maa razaqtanaa wa qinaa 'adzaaban naar."
+                    </p>
+
+                    <!-- Meaning -->
+                    <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-600 font-semibold space-y-1">
+                        <span class="text-slate-400 font-bold uppercase text-[10px]">Artinya:</span>
+                        <p id="doa-meaning">"Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan kepada kami dan peliharalah kami dari siksa api neraka."</p>
+                    </div>
+
+                    <!-- Action Audio Button -->
+                    <button onclick="speakCurrentDoa()" class="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded-2xl font-bold text-sm shadow btn-bounce flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i> Dengarkan Bacaan Doa
+                    </button>
+                </div>
+            </section>
+
+            <!-- ================= RUKUN ISLAM & IMAN VIEW ================= -->
+            <section id="view-rukun" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-amber-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-star-and-crescent"></i> Rukun Islam & Iman
+                    </h2>
+                    <div></div>
+                </div>
+
+                <!-- Tab Toggle -->
+                <div class="flex bg-slate-200 p-1 rounded-2xl text-xs font-bold">
+                    <button id="tab-rukun-islam" onclick="switchRukunTab('islam')" class="flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce">5 Rukun Islam</button>
+                    <button id="tab-rukun-iman" onclick="switchRukunTab('iman')" class="flex-1 py-2 rounded-xl text-slate-600 btn-bounce">6 Rukun Iman</button>
+                </div>
+
+                <!-- Rukun Cards List -->
+                <div id="rukun-cards-container" class="space-y-3">
+                    <!-- Dynamic Rukun Items -->
+                </div>
+            </section>
+
+            <!-- ================= TATA CARA WUDHU & SHALAT VIEW ================= -->
+            <section id="view-ibadah" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-sky-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-person-praying"></i> Wudhu & Shalat
+                    </h2>
+                    <div></div>
+                </div>
+
+                <!-- Tab Switcher -->
+                <div class="flex bg-slate-200 p-1 rounded-2xl text-xs font-bold">
+                    <button id="tab-ibadah-wudhu" onclick="switchIbadahTab('wudhu')" class="flex-1 py-2 rounded-xl bg-sky-500 text-white shadow btn-bounce">Langkah Wudhu</button>
+                    <button id="tab-ibadah-shalat" onclick="switchIbadahTab('shalat')" class="flex-1 py-2 rounded-xl text-slate-600 btn-bounce">Gerakan Shalat</button>
+                </div>
+
+                <!-- Steps Interactive Display -->
+                <div class="bg-white border-4 border-sky-300 rounded-3xl p-5 shadow-md space-y-4 text-center">
+                    <div class="flex justify-between items-center text-xs font-extrabold text-sky-600">
+                        <span>Langkah <span id="ibadah-step-num">1</span> dari <span id="ibadah-total-steps">8</span></span>
+                        <span id="ibadah-badge-title" class="bg-sky-100 px-2.5 py-0.5 rounded-full">Urutan Wudhu</span>
+                    </div>
+
+                    <!-- Step Image / Emoji Visual -->
+                    <div id="ibadah-visual-box" class="w-28 h-28 mx-auto bg-sky-50 border-2 border-sky-200 rounded-2xl flex items-center justify-center text-6xl shadow-inner wiggle">
+                        💧
+                    </div>
+
+                    <div class="space-y-1">
+                        <h3 id="ibadah-step-title" class="text-xl font-extrabold text-slate-800">1. Membaca Basmalah & Mencuci Tangan</h3>
+                        <p id="ibadah-step-desc" class="text-xs text-slate-500 font-medium">Niat karena Allah SWT dan cuci kedua telapak tangan hingga bersih 3 kali.</p>
+                    </div>
+
+                    <!-- Prev/Next Controls -->
+                    <div class="flex items-center gap-3 pt-2">
+                        <button id="btn-ibadah-prev" onclick="prevIbadahStep()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-2xl font-bold text-xs btn-bounce">
+                            <i class="fa-solid fa-arrow-left"></i> Sebelum
+                        </button>
+                        <button onclick="speakCurrentIbadahStep()" class="w-11 h-11 bg-sky-500 text-white rounded-2xl flex items-center justify-center text-base btn-bounce shadow">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <button id="btn-ibadah-next" onclick="nextIbadahStep()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-2.5 rounded-2xl font-bold text-xs btn-bounce shadow">
+                            Lanjut <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= ABJAD VIEW ================= -->
+            <section id="view-alphabet" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-rose-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-font"></i> Abjad & Kata
+                    </h2>
+                    <div></div>
+                </div>
+
+                <div class="bg-white border-4 border-rose-300 rounded-3xl p-5 shadow-md flex flex-col items-center text-center space-y-3">
+                    <div onclick="speakCurrentAlphabet()" class="w-32 h-32 bg-gradient-to-tr from-rose-400 to-pink-500 rounded-3xl flex items-center justify-center text-white text-7xl font-black shadow-lg cursor-pointer btn-bounce">
+                        <span id="alpha-big-letter">A</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="text-[10px] bg-rose-100 text-rose-600 px-2.5 py-0.5 rounded-full font-bold inline-block">Contoh Kata:</p>
+                        <h3 id="alpha-word" class="text-3xl font-black text-slate-800">Ayam</h3>
+                        <div id="alpha-emoji" class="text-6xl py-1">🐔</div>
+                    </div>
+
+                    <button onclick="speakCurrentAlphabet()" class="bg-rose-500 text-white px-5 py-2.5 rounded-2xl font-bold text-xs shadow btn-bounce flex items-center gap-2">
+                        <i class="fa-solid fa-volume-high"></i> Dengarkan Suara
+                    </button>
+                </div>
+
+                <div class="bg-white border-2 border-slate-200 p-3 rounded-2xl shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 mb-2 text-center uppercase">Pilih Huruf:</p>
+                    <div id="alphabet-grid" class="grid grid-cols-6 gap-1.5">
+                        <!-- Dynamic Alphabet Buttons -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= ANGKA VIEW ================= -->
+            <section id="view-numbers" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-amber-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-calculator"></i> Angka & Hitung
+                    </h2>
+                    <div></div>
+                </div>
+
+                <div class="flex bg-slate-200 p-1 rounded-2xl text-xs font-bold">
+                    <button id="tab-num-learn" onclick="switchNumberTab('learn')" class="flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce">Mengenal Angka</button>
+                    <button id="tab-num-count" onclick="switchNumberTab('count')" class="flex-1 py-2 rounded-xl text-slate-600 btn-bounce">Game Hitung</button>
+                </div>
+
+                <div id="subview-number-learn" class="space-y-4">
+                    <div class="bg-white border-4 border-amber-300 rounded-3xl p-5 shadow-md flex flex-col items-center text-center space-y-3">
+                        <div onclick="speakCurrentNumber()" class="w-32 h-32 bg-gradient-to-tr from-amber-400 to-yellow-500 rounded-3xl flex items-center justify-center text-white text-7xl font-black shadow-lg cursor-pointer btn-bounce">
+                            <span id="number-big-display">1</span>
+                        </div>
+
+                        <div id="number-objects-container" class="flex flex-wrap justify-center gap-1.5 text-3xl max-h-28 overflow-y-auto p-2 bg-amber-50/50 rounded-2xl w-full">
+                            <!-- Emoji objects -->
+                        </div>
+
+                        <button onclick="speakCurrentNumber()" class="bg-amber-500 text-white px-5 py-2.5 rounded-2xl font-bold text-xs shadow btn-bounce flex items-center gap-2">
+                            <i class="fa-solid fa-volume-high"></i> Bunyi Angka
+                        </button>
+                    </div>
+
+                    <div class="bg-white border-2 border-slate-200 p-3 rounded-2xl shadow-sm">
+                        <p class="text-xs font-bold text-slate-400 mb-2 text-center uppercase">Angka 1 - 20:</p>
+                        <div id="numbers-grid" class="grid grid-cols-5 gap-1.5">
+                            <!-- Dynamic Number Buttons -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subview-number-count" class="hidden space-y-4">
+                    <div class="bg-white border-4 border-amber-300 rounded-3xl p-5 shadow-md text-center space-y-4">
+                        <h3 class="text-base font-bold text-slate-800">Berapa Banyak Benda Ini? 🤔</h3>
+                        <div id="count-game-items" class="flex flex-wrap justify-center items-center gap-2 py-4 min-h-[120px] bg-amber-50 rounded-2xl">
+                            <!-- Dynamic count items -->
+                        </div>
+                        <div id="count-game-options" class="flex justify-center gap-2">
+                            <!-- Dynamic options -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= WARNA & BENTUK VIEW ================= -->
+            <section id="view-shapes" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-indigo-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-palette"></i> Warna & Bentuk
+                    </h2>
+                    <div></div>
+                </div>
+
+                <div class="bg-white border-3 border-indigo-200 rounded-3xl p-4 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-indigo-600 flex items-center gap-1">
+                        <i class="fa-solid fa-brush"></i> Warna-Warni
+                    </h3>
+                    <div id="colors-grid" class="grid grid-cols-3 gap-2"></div>
+                </div>
+
+                <div class="bg-white border-3 border-teal-200 rounded-3xl p-4 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-teal-600 flex items-center gap-1">
+                        <i class="fa-solid fa-icons"></i> Bentuk Geometri
+                    </h3>
+                    <div id="shapes-grid" class="grid grid-cols-2 gap-2"></div>
+                </div>
+            </section>
+
+            <!-- ================= KUIS VIEW ================= -->
+            <section id="view-quiz" class="hidden space-y-4 card-pop">
+                <div class="flex items-center justify-between">
+                    <button onclick="navigateTo('home')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-bold text-xs btn-bounce flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left"></i> Beranda
+                    </button>
+                    <h2 class="text-lg font-extrabold text-purple-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-gamepad"></i> Kuis Pintar
+                    </h2>
+                    <div></div>
+                </div>
+
+                <div class="bg-white border-4 border-purple-300 rounded-3xl p-5 shadow-md">
+                    <div class="flex justify-between items-center pb-3 border-b mb-4 text-xs font-bold">
+                        <span class="text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
+                            Soal: <span id="quiz-step">1</span> / <span id="quiz-total">5</span>
+                        </span>
+                        <span class="text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                            <i class="fa-solid fa-star text-yellow-500"></i> Skor: <span id="quiz-score">0</span>
+                        </span>
+                    </div>
+
+                    <div id="quiz-question-container" class="text-center space-y-4">
+                        <h3 id="quiz-question-text" class="text-base font-extrabold text-slate-800">Pertanyaan...</h3>
+                        
+                        <div id="quiz-visual-box" class="min-h-[100px] flex items-center justify-center text-5xl bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                            ❓
+                        </div>
+
+                        <div id="quiz-options-container" class="grid grid-cols-2 gap-2">
+                            <!-- Dynamic Option Buttons -->
+                        </div>
+                    </div>
+
+                    <!-- Quiz Finish Screen -->
+                    <div id="quiz-finish-box" class="hidden text-center space-y-4 py-4">
+                        <div class="w-20 h-20 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-4xl mx-auto border-4 border-yellow-300 animate-bounce">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-800">Muntaz! Hebat Sekali! 🎉</h3>
+                        <p class="text-slate-600 font-bold text-xs">Kamu sudah menyelesaikan kuis!</p>
+                        <div class="inline-flex items-center gap-1.5 bg-amber-100 border border-amber-300 text-amber-800 font-extrabold text-lg px-4 py-2 rounded-2xl">
+                            <i class="fa-solid fa-star text-yellow-500"></i> +<span id="quiz-reward-stars">0</span> Bintang Baru
+                        </div>
+                        <div>
+                            <button onclick="restartQuiz()" class="bg-purple-600 text-white font-bold px-6 py-2.5 rounded-2xl text-xs shadow btn-bounce">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> Main Lagi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Android Mobile Bottom Navigation Bar -->
+        <nav class="bg-white/95 backdrop-blur-md border-t-2 border-slate-200 fixed md:absolute bottom-0 left-0 right-0 z-40 px-3 py-2 pb-safe flex justify-around items-center">
+            <button onclick="navigateTo('home')" id="nav-btn-home" class="flex flex-col items-center text-emerald-600 btn-bounce">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-bold mt-0.5">Beranda</span>
+            </button>
+            <button onclick="navigateTo('hijaiyah')" id="nav-btn-hijaiyah" class="flex flex-col items-center text-slate-400 hover:text-emerald-600 btn-bounce">
+                <i class="fa-solid fa-book-quran text-lg"></i>
+                <span class="text-[10px] font-bold mt-0.5">Hijaiyah</span>
+            </button>
+            <button onclick="navigateTo('doa')" id="nav-btn-doa" class="flex flex-col items-center text-slate-400 hover:text-teal-600 btn-bounce">
+                <i class="fa-solid fa-hands-praying text-lg"></i>
+                <span class="text-[10px] font-bold mt-0.5">Doa</span>
+            </button>
+            <button onclick="navigateTo('quiz')" id="nav-btn-quiz" class="flex flex-col items-center text-slate-400 hover:text-purple-600 btn-bounce">
+                <i class="fa-solid fa-gamepad text-lg"></i>
+                <span class="text-[10px] font-bold mt-0.5">Kuis</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border-4 border-indigo-300 rounded-3xl max-w-xs w-full p-5 shadow-2xl space-y-4 card-pop">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-lg font-extrabold text-indigo-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-gear"></i> Profil Anak
+                </h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 text-xl font-bold">&times;</button>
+            </div>
+
+            <!-- Input Name -->
+            <div class="space-y-1">
+                <label class="block text-xs font-bold text-slate-700">Nama Panggilan:</label>
+                <input type="text" id="input-username" class="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500" placeholder="Nama...">
+            </div>
+
+            <!-- Avatar Picker -->
+            <div class="space-y-1">
+                <label class="block text-xs font-bold text-slate-700">Pilih Avatar:</label>
+                <div class="grid grid-cols-4 gap-2 text-2xl" id="avatar-options"></div>
+            </div>
+
+            <!-- Toggles -->
+            <div class="space-y-2 pt-1 border-t">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span>Efek Suara (SFX):</span>
+                    <button id="toggle-sfx-btn" onclick="toggleSFX()" class="px-3 py-1 rounded-full bg-emerald-500 text-white">ON</button>
+                </div>
+                <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span>Pengucapan Audio:</span>
+                    <button id="toggle-speech-btn" onclick="toggleSpeech()" class="px-3 py-1 rounded-full bg-sky-500 text-white">ON</button>
+                </div>
+            </div>
+
+            <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs shadow btn-bounce">
+                Simpan Profil
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* State Variables */
+        let state = {
+            username: "Adik Pintar",
+            avatar: "🦁",
+            stars: 0,
+            sfxEnabled: true,
+            speechEnabled: true,
+            currentHijaiyahIndex: 0,
+            currentHarakat: 'a', // 'a', 'i', 'u'
+            currentDoaIndex: 0,
+            currentIbadahMode: 'wudhu', // 'wudhu', 'shalat'
+            currentIbadahStep: 0,
+            currentAlphaIndex: 0,
+            currentNumberIndex: 0,
+            quizIndex: 0,
+            quizScore: 0,
+            currentQuizQuestions: []
+        };
+
+        const AVATARS = ["🦁", "🐶", "🐱", "🐰", "🐼", "🦄", "🦊", "🐧"];
+
+        /* Haptic Feedback Helper for Android Vibration */
+        function triggerHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate(25); // short 25ms tactile bump
+            }
+        }
+
+        /* Web Audio API Synth FX */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSoundEffect(type) {
+            triggerHaptic();
+            if (!state.sfxEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.08);
+                    osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.16);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                }
+            } catch (e) {}
+        }
+
+        /* Speech Synthesis Function */
+        function speakText(text) {
+            if (!state.speechEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.85;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        /* DATASETS: ISLAMI DASAR */
+        const HIJAIYAH_DATA = [
+            { base: 'أ', name: 'Alif', harakat: { a: 'أَ', i: 'إِ', u: 'أُ' }, latin: { a: 'A', i: 'I', u: 'U' }, example: 'أَنَانَاس (Ananas)' },
+            { base: 'ب', name: 'Ba', harakat: { a: 'بَ', i: 'بِ', u: 'بُ' }, latin: { a: 'Ba', i: 'Bi', u: 'Bu' }, example: 'بَقَرَةٌ (Baqaratun)' },
+            { base: 'ت', name: 'Ta', harakat: { a: 'تَ', i: 'تِ', u: 'تُ' }, latin: { a: 'Ta', i: 'Ti', u: 'Tu' }, example: 'تُفَّاحٌ (Tuffahun)' },
+            { base: 'ث', name: 'Tsa', harakat: { a: 'ثَ', i: 'ثِ', u: 'ثُ' }, latin: { a: 'Tsa', i: 'Tsi', u: 'Tsu' }, example: 'ثَوْمٌ (Tsaumun)' },
+            { base: 'ج', name: 'Jim', harakat: { a: 'جَ', i: 'جِ', u: 'جُ' }, latin: { a: 'Ja', i: 'Ji', u: 'Ju' }, example: 'جَمَلٌ (Jamalun)' },
+            { base: 'ح', name: 'Ha', harakat: { a: 'حَ', i: 'حِ', u: 'حُ' }, latin: { a: 'Ha', i: 'Hi', u: 'Hu' }, example: 'حِصَانٌ (Hisanun)' },
+            { base: 'خ', name: 'Kho', harakat: { a: 'خَ', i: 'خِ', u: 'خُ' }, latin: { a: 'Kho', i: 'Khi', u: 'Khu' }, example: 'خُبْزٌ (Khubzun)' },
+            { base: 'د', name: 'Dal', harakat: { a: 'دَ', i: 'دِ', u: 'دُ' }, latin: { a: 'Da', i: 'Di', u: 'Du' }, example: 'دَجَاجَةٌ (Dajajatun)' },
+            { base: 'ذ', name: 'Dzal', harakat: { a: 'ذَ', i: 'ذِ', u: 'ذُ' }, latin: { a: 'Dza', i: 'Dzi', u: 'Dzu' }, example: 'ذُبَابٌ (Dzubabun)' },
+            { base: 'ر', name: 'Ro', harakat: { a: 'رَ', i: 'رِ', u: 'رُ' }, latin: { a: 'Ro', i: 'Ri', u: 'Ru' }, example: 'رُمَّانٌ (Rummanun)' },
+            { base: 'ز', name: 'Zai', harakat: { a: 'زَ', i: 'زِ', u: 'زُ' }, latin: { a: 'Za', i: 'Zi', u: 'Zu' }, example: 'زَهْرَةٌ (Zahratun)' },
+            { base: 'س', name: 'Sin', harakat: { a: 'سَ', i: 'سِ', u: 'سُ' }, latin: { a: 'Sa', i: 'Si', u: 'Su' }, example: 'سَمَكَةٌ (Samakatun)' },
+            { base: 'ش', name: 'Syin', harakat: { a: 'شَ', i: 'شِ', u: 'شُ' }, latin: { a: 'Sya', i: 'Syi', u: 'Syu' }, example: 'شَمْسٌ (Syamsun)' },
+            { base: 'ص', name: 'Shod', harakat: { a: 'صَ', i: 'صِ', u: 'صُ' }, latin: { a: 'Sho', i: 'Shi', u: 'Shu' }, example: 'صَابُوْنٌ (Shabunun)' },
+            { base: 'ض', name: 'Dhod', harakat: { a: 'ضَ', i: 'ضِ', u: 'ضُ' }, latin: { a: 'Dho', i: 'Dhi', u: 'Dhu' }, example: 'ضَوْءٌ (Dhou\'un)' },
+            { base: 'ط', name: 'Tho', harakat: { a: 'طَ', i: 'طِ', u: 'طُ' }, latin: { a: 'Tho', i: 'Thi', u: 'Thu' }, example: 'طَيَّارَةٌ (Thayyaratun)' },
+            { base: 'ظ', name: 'Zho', harakat: { a: 'ظَ', i: 'ظِ', u: 'ظُ' }, latin: { a: 'Zho', i: 'Zhi', u: 'Zhu' }, example: 'ظَرْفٌ (Zharfun)' },
+            { base: 'ع', name: 'Ain', harakat: { a: 'عَ', i: 'عِ', u: 'عُ' }, latin: { a: 'A', i: 'I', u: 'U' }, example: 'عِنَبٌ (Inabun)' },
+            { base: 'غ', name: 'Ghoin', harakat: { a: 'غَ', i: 'غِ', u: 'غُ' }, latin: { a: 'Gho', i: 'Ghi', u: 'Ghu' }, example: 'غَزَالٌ (Ghazalun)' },
+            { base: 'ف', name: 'Fa', harakat: { a: 'فَ', i: 'فِ', u: 'فُ' }, latin: { a: 'Fa', i: 'Fi', u: 'Fu' }, example: 'فِيْلٌ (Filun)' },
+            { base: 'ق', name: 'Qof', harakat: { a: 'قَ', i: 'قِ', u: 'قُ' }, latin: { a: 'Qo', i: 'Qi', u: 'Qu' }, example: 'قَمَرٌ (Qamarun)' },
+            { base: 'ك', name: 'Kaf', harakat: { a: 'كَ', i: 'كِ', u: 'كُ' }, latin: { a: 'Ka', i: 'Ki', u: 'Ku' }, example: 'كِتَابٌ (Kitabun)' },
+            { base: 'ل', name: 'Lam', harakat: { a: 'لَ', i: 'لِ', u: 'لُ' }, latin: { a: 'La', i: 'Li', u: 'Lu' }, example: 'لَبَنٌ (Labanun)' },
+            { base: 'م', name: 'Mim', harakat: { a: 'مَ', i: 'مِ', u: 'مُ' }, latin: { a: 'Ma', i: 'Mi', u: 'Mu' }, example: 'مَاءٌ (Ma\'un)' },
+            { base: 'ن', name: 'Nun', harakat: { a: 'نَ', i: 'نِ', u: 'نُ' }, latin: { a: 'Na', i: 'Ni', u: 'Nu' }, example: 'نَجْمٌ (Najmun)' },
+            { base: 'و', name: 'Wawu', harakat: { a: 'وَ', i: 'وِ', u: 'وُ' }, latin: { a: 'Wa', i: 'Wi', u: 'Wu' }, example: 'وَرْدَةٌ (Wardatun)' },
+            { base: 'هـ', name: 'Ha', harakat: { a: 'هَ', i: 'هِ', u: 'هُ' }, latin: { a: 'Ha', i: 'Hi', u: 'Hu' }, example: 'هِلَالٌ (Hilalun)' },
+            { base: 'ي', name: 'Ya', harakat: { a: 'يَ', i: 'يِ', u: 'يُ' }, latin: { a: 'Ya', i: 'Yi', u: 'Yu' }, example: 'يَدٌ (Yadun)' }
+        ];
+
+        const DOA_DATA = [
+            {
+                title: 'Doa Sebelum Makan',
+                icon: '🍽️️',
+                arabic: 'اَللّٰهُمَّ بَارِكْ لَنَا فِيْمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',
+                latin: 'Allahumma baarik lanaa fii maa razaqtanaa wa qinaa \'adzaaban naar.',
+                meaning: 'Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan dan peliharalah kami dari siksa api neraka.'
+            },
+            {
+                title: 'Doa Sesudah Makan',
+                icon: '🥣',
+                arabic: 'اَلْحَمْدُ لِلّٰهِ الَّذِيْ اَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مِنَ الْمُسْلِمِيْنَ',
+                latin: 'Alhamdu lillaahilladzi ath\'amanaa wa saqaanaa wa ja\'alanaa minal muslimiin.',
+                meaning: 'Segala puji bagi Allah yang telah memberi kami makan dan minum serta menjadikan kami termasuk orang-orang muslim.'
+            },
+            {
+                title: 'Doa Sebelum Tidur',
+                icon: '🌙',
+                arabic: 'بِاسْمِكَ اللّٰهُمَّ اَحْيَا وَبِاسْمِكَ اَمُوْتُ',
+                latin: 'Bismikallahumma ahyaa wa bismika amuutu.',
+                meaning: 'Dengan nama-Mu ya Allah aku hidup dan dengan nama-Mu aku mati.'
+            },
+            {
+                title: 'Doa Bangun Tidur',
+                icon: '☀️',
+                arabic: 'اَلْحَمْدُ لِلّٰهِ الَّذِيْ اَحْيَانَا بَعْدَ مَا اَمَاتَنَا وَاِلَيْهِ النُّشُوْرُ',
+                latin: 'Alhamdu lillaahilladzi ahyaanaa ba\'da maa amaatanaa wa ilaihin nusyuur.',
+                meaning: 'Segala puji bagi Allah yang telah menghidupkan kami kembali setelah mematikan kami dan kepada-Nya kami dibangkitkan.'
+            },
+            {
+                title: 'Doa Untuk Orang Tua',
+                icon: '❤️',
+                arabic: 'رَبِّ اغْفِرْ لِيْ وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِيْ صَغِيْرًا',
+                latin: 'Rabbighfir lii wa liwaalidayya warhamhumaa kamaa rabbayaanii shaghiiraa.',
+                meaning: 'Ya Rabbku, ampunilah aku dan kedua orang tuaku, serta kasihilah keduanya sebagaimana mereka merawatku sewaktu kecil.'
+            },
+            {
+                title: 'Doa Sebelum Belajar',
+                icon: '📚',
+                arabic: 'رَبِّ زِدْنِيْ عِلْمًا وَارْزُقْنِيْ فَهْمًا',
+                latin: 'Rabbi zidnii \'ilman warzuqnii fahman.',
+                meaning: 'Ya Allah, tambahkanlah aku ilmu dan berilah aku karunia untuk memahaminya.'
+            }
+        ];
+
+        const RUKUN_ISLAM = [
+            { num: 1, title: 'Mengucapkan Dua Kalimat Syahadat', desc: 'Bersaksi tidak ada Tuhan selain Allah & Nabi Muhammad utusan Allah.', icon: '☝️' },
+            { num: 2, title: 'Mendirikan Shalat 5 Waktu', desc: 'Mengerjakan Subuh, Dzuhur, Ashar, Maghrib, dan Isya.', icon: '🕌' },
+            { num: 3, title: 'Membayar Zakat', desc: 'Memberikan sebagian harta kepada orang yang membutuhkan.', icon: '🤝' },
+            { num: 4, title: 'Mengerjakan Puasa Ramadhan', desc: 'Menahan lapar dan haus dari terbit fajar hingga maghrib.', icon: '🌙' },
+            { num: 5, title: 'Menunaikan Ibadah Haji', desc: 'Bagi yang mampu berkunjung ke Baitullah Makkah.', icon: '🕋' }
+        ];
+
+        const RUKUN_IMAN = [
+            { num: 1, title: 'Iman Kepada Allah SWT', desc: 'Meyakini Allah Pencipta seluruh alam semesta.', icon: '✨' },
+            { num: 2, title: 'Iman Kepada Malaikat Allah', desc: 'Meyakini malaikat seperti Jibril, Mikail, dll.', icon: '👼' },
+            { num: 3, title: 'Iman Kepada Kitab-Kitab Allah', desc: 'Meyakini Taurat, Zabur, Injil, dan Al-Qur\'an.', icon: '📖' },
+            { num: 4, title: 'Iman Kepada Rasul & Nabi Allah', desc: 'Meyakini 25 Nabi dan Rasul utusan Allah.', icon: '🕌' },
+            { num: 5, title: 'Iman Kepada Hari Kiamat', desc: 'Meyakini adanya hari akhir dan pembalasan.', icon: '⏳' },
+            { num: 6, title: 'Iman Kepada Qada & Qadar', desc: 'Meyakini takdir baik dan takdir buruk dari Allah.', icon: '🌿' }
+        ];
+
+        const WUDHU_STEPS = [
+            { step: 1, title: 'Membaca Basmalah & Mencuci Tangan', desc: 'Niat karena Allah dan mencuci kedua telapak tangan hingga bersih 3x.', icon: '🧼' },
+            { step: 2, title: 'Berkumur-kumur', desc: 'Membersihkan mulut dari sisa makanan sebanyak 3x.', icon: '👄' },
+            { step: 3, title: 'Membersihkan Hidung', desc: 'Menghirup sedikit air ke hidung lalu mengeluarkannya 3x.', icon: '👃' },
+            { step: 4, title: 'Membasuh Muka', desc: 'Membasuh seluruh permukaan wajah secara merata 3x.', icon: '😊' },
+            { step: 5, title: 'Membasuh Kedua Tangan hingga Siku', desc: 'Mendahulukan tangan kanan lalu tangan kiri hingga siku 3x.', icon: '💪' },
+            { step: 6, title: 'Mengusap Kepala & Telinga', desc: 'Mengusap sebagian rambut kepala dan kedua telapak telinga 1x/3x.', icon: '👂' },
+            { step: 7, title: 'Membasuh Kedua Kaki hingga Mata Kaki', desc: 'Mendahulukan kaki kanan lalu kaki kiri hingga mata kaki 3x.', icon: '🦶' },
+            { step: 8, title: 'Membaca Doa Setelah Wudhu', desc: 'Menghadap kiblat dan membaca doa bersaksi atas keesaan Allah.', icon: '🤲' }
+        ];
+
+        const SHALAT_STEPS = [
+            { step: 1, title: 'Niat & Takbiratul Ihram', desc: 'Berdiri tegak menghadap kiblat dan mengangkat kedua tangan seraya membaca "Allahu Akbar".', icon: '🙋‍♂️' },
+            { step: 2, title: 'Sedekap & Membaca Al-Fatihah', desc: 'Meletakkan tangan kanan di atas tangan kiri di dada, membaca doa Iftitah & Surat Al-Fatihah.', icon: '🤲' },
+            { step: 3, title: 'Rukuk dengan Tuma\'ninah', desc: 'Membungkukkan badan, membungkuk lurus dengan tangan memegang lutut membaca tasbih rukuk.', icon: '🙇‍♂️' },
+            { step: 4, title: 'I\'tidal (Bangkit dari Rukuk)', desc: 'Berdiri lurus kembali seraya membaca "Sami\'allahu liman hamidah...".', icon: '🧍‍♂️' },
+            { step: 5, title: 'Sujud Pertama & Kedua', desc: 'Menempelkan dahi, hidung, kedua telapak tangan, lutut, dan ujung jari kaki ke lantai.', icon: '🛐' },
+            { step: 6, title: 'Duduk di Antara Dua Suud', desc: 'Duduk tenang membaca doa pengampunan dan kasih sayang.', icon: '🧎‍♂️' },
+            { step: 7, title: 'Tasyahud Akhir', desc: 'Duduk membaca bacaan Tahiyyat Akhir dan Shalawat Nabi.', icon: '☝️' },
+            { step: 8, title: 'Salam Ke Kanan & Kiri', desc: 'Menolehkan wajah ke kanan lalu ke kiri membaca "Assalamu\'alaikum wa rahmatullah".', icon: '😃' }
+        ];
+
+        const ALPHABET_DATA = [
+            { letter: 'A', word: 'Ayam', emoji: '🐔' }, { letter: 'B', word: 'Bebek', emoji: '🦆' },
+            { letter: 'C', word: 'Cicak', emoji: '🦎' }, { letter: 'D', word: 'Domba', emoji: '🐑' },
+            { letter: 'E', word: 'Elang', emoji: '🦅' }, { letter: 'F', word: 'Flamingo', emoji: '🦩' },
+            { letter: 'G', word: 'Gajah', emoji: '🐘' }, { letter: 'H', word: 'Harimau', emoji: '🐯' },
+            { letter: 'I', word: 'Ikan', emoji: '🐟' }, { letter: 'J', word: 'Jerapah', emoji: '🦒' },
+            { letter: 'K', word: 'Kucing', emoji: '🐱' }, { letter: 'L', word: 'Lumba-lumba', emoji: '🐬' },
+            { letter: 'M', word: 'Monyet', emoji: '🐒' }, { letter: 'N', word: 'Naga', emoji: '🐉' },
+            { letter: 'O', word: 'Otter', emoji: '🦦' }, { letter: 'P', word: 'Panda', emoji: '🐼' },
+            { letter: 'Q', word: 'Qorin', emoji: '📖' }, { letter: 'R', word: 'Rusa', emoji: '🦌' },
+            { letter: 'S', word: 'Sapi', emoji: '🐮' }, { letter: 'T', word: 'Singa', emoji: '🦁' },
+            { letter: 'U', word: 'Ular', emoji: '🐍' }, { letter: 'V', word: 'Vase', emoji: '🏺' },
+            { letter: 'W', word: 'Wortel', emoji: '🥕' }, { letter: 'X', word: 'Xylophone', emoji: '🎼' },
+            { letter: 'Y', word: 'Yo-yo', emoji: '🪀' }, { letter: 'Z', word: 'Zebra', emoji: '🦓' }
+        ];
+
+        const NUMBERS_DATA = [
+            { num: 1, name: 'Satu', emoji: '🍎' }, { num: 2, name: 'Dua', emoji: '🎈' },
+            { num: 3, name: 'Tiga', emoji: '⭐' }, { num: 4, name: 'Empat', emoji: '🚗' },
+            { num: 5, name: 'Lima', emoji: '🌸' }, { num: 6, name: 'Enam', emoji: '🦋' },
+            { num: 7, name: 'Tujuh', emoji: '🐥' }, { num: 8, name: 'Delapan', emoji: '🍬' },
+            { num: 9, name: 'Sembilan', emoji: '🍕' }, { num: 10, name: 'Sepuluh', emoji: '⚽' },
+            { num: 11, name: 'Sebelas', emoji: '🍓' }, { num: 12, name: 'Dua Belas', emoji: '🎨' },
+            { num: 13, name: 'Tiga Belas', emoji: '🚀' }, { num: 14, name: 'Empat Belas', emoji: '🍦' },
+            { num: 15, name: 'Lima Belas', emoji: '🎁' }, { num: 16, name: 'Enam Belas', emoji: '🐝' },
+            { num: 17, name: 'Tujuh Belas', emoji: '🍩' }, { num: 18, name: 'Delapan Belas', emoji: '🌈' },
+            { num: 19, name: 'Sembilan Belas', emoji: '🧸' }, { num: 20, name: 'Dua Puluh', emoji: '🎉' }
+        ];
+
+        const COLORS_DATA = [
+            { name: 'Merah', class: 'bg-red-500' }, { name: 'Biru', class: 'bg-blue-500' },
+            { name: 'Kuning', class: 'bg-yellow-500' }, { name: 'Hijau', class: 'bg-green-500' },
+            { name: 'Jingga', class: 'bg-orange-500' }, { name: 'Ungu', class: 'bg-purple-500' }
+        ];
+
+        const SHAPES_DATA = [
+            { name: 'Lingkaran', svg: '<svg class="w-12 h-12 fill-rose-500" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg>' },
+            { name: 'Persegi', svg: '<svg class="w-12 h-12 fill-sky-500" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="5"/></svg>' },
+            { name: 'Segitiga', svg: '<svg class="w-12 h-12 fill-amber-500" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90"/></svg>' },
+            { name: 'Bintang', svg: '<svg class="w-12 h-12 fill-yellow-400" viewBox="0 0 100 100"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36"/></svg>' }
+        ];
+
+        const QUIZ_BANK = [
+            { question: "Huruf Hijaiyah pertama adalah...", type: "text", hint: "أ", answer: "Alif", options: ["Alif", "Ba", "Ta", "Jim"] },
+            { question: "Berapa jumlah Rukun Islam?", type: "text", hint: "🕌", answer: "5", options: ["3", "4", "5", "6"] },
+            { question: "Doa sebelum makan dibaca agar...", type: "text", hint: "🍽️", answer: "Berkah", options: ["Kenyang", "Berkah", "Ngantuk", "Haus"] },
+            { question: "Huruf apakah ini?", type: "text", hint: "B", answer: "B", options: ["A", "B", "C", "D"] },
+            { question: "Berapa jumlah bintang ini?", type: "emoji", hint: "⭐ ⭐ ⭐ ⭐", answer: "4", options: ["2", "3", "4", "5"] },
+            { question: "Kitab suci umat Islam adalah...", type: "text", hint: "📖", answer: "Al-Qur'an", options: ["Al-Qur'an", "Kamus", "Majalah", "Novel"] }
+        ];
+
+        /* PWA Prompt Handler */
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('pwa-install-btn');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('pwa-install-btn').classList.add('hidden');
+                });
+            }
+        }
+
+        /* INITIALIZATION */
+        window.onload = function() {
+            loadLocalStorage();
+            renderHijaiyahGrid();
+            renderDoaList();
+            renderRukunCards('islam');
+            updateIbadahStepDisplay();
+            renderAlphabetGrid();
+            renderNumbersGrid();
+            renderColorsAndShapes();
+            updateAlphabetDisplay(0);
+            updateNumberDisplay(0);
+            generateCountGame();
+            updateProfileUI();
+        };
+
+        function loadLocalStorage() {
+            const savedStars = localStorage.getItem('kidedu_stars');
+            if (savedStars !== null) state.stars = parseInt(savedStars);
+            
+            const savedName = localStorage.getItem('kidedu_name');
+            if (savedName) state.username = savedName;
+
+            const savedAvatar = localStorage.getItem('kidedu_avatar');
+            if (savedAvatar) state.avatar = savedAvatar;
+
+            document.getElementById('star-count-display').innerText = state.stars;
+        }
+
+        function addStars(amount) {
+            state.stars += amount;
+            document.getElementById('star-count-display').innerText = state.stars;
+            localStorage.setItem('kidedu_stars', state.stars);
+        }
+
+        /* NAVIGATION & ROUTING */
+        function navigateTo(viewName) {
+            playSoundEffect('pop');
+            const views = ['home', 'hijaiyah', 'doa', 'rukun', 'ibadah', 'alphabet', 'numbers', 'shapes', 'quiz'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            // Update Bottom Nav Styling
+            const navBtns = ['home', 'hijaiyah', 'doa', 'quiz'];
+            navBtns.forEach(btn => {
+                const navEl = document.getElementById(`nav-btn-${btn}`);
+                if (navEl) {
+                    if (btn === viewName) {
+                        navEl.className = 'flex flex-col items-center text-emerald-600 btn-bounce font-bold';
+                    } else {
+                        navEl.className = 'flex flex-col items-center text-slate-400 hover:text-emerald-600 btn-bounce font-medium';
+                    }
+                }
+            });
+
+            if (viewName === 'quiz') startQuiz();
+        }
+
+        /* TOGGLES */
+        function toggleSFX() {
+            state.sfxEnabled = !state.sfxEnabled;
+            document.getElementById('toggle-sfx-btn').innerText = state.sfxEnabled ? 'ON' : 'OFF';
+            document.getElementById('toggle-sfx-btn').className = state.sfxEnabled ? 'px-3 py-1 rounded-full bg-emerald-500 text-white' : 'px-3 py-1 rounded-full bg-slate-300 text-slate-600';
+            playSoundEffect('pop');
+        }
+
+        function toggleSpeech() {
+            state.speechEnabled = !state.speechEnabled;
+            document.getElementById('toggle-speech-btn').innerText = state.speechEnabled ? 'ON' : 'OFF';
+            document.getElementById('toggle-speech-btn').className = state.speechEnabled ? 'px-3 py-1 rounded-full bg-sky-500 text-white' : 'px-3 py-1 rounded-full bg-slate-300 text-slate-600';
+            playSoundEffect('pop');
+        }
+
+        /* MODULE: HIJAIYAH */
+        function renderHijaiyahGrid() {
+            const grid = document.getElementById('hijaiyah-grid');
+            grid.innerHTML = '';
+            HIJAIYAH_DATA.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 font-arabic font-bold text-2xl rounded-xl border-2 transition btn-bounce ${index === 0 ? 'bg-emerald-500 text-white border-emerald-600 shadow' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-emerald-100'}`;
+                btn.id = `hij-btn-${index}`;
+                btn.innerText = item.harakat[state.currentHarakat];
+                btn.onclick = () => selectHijaiyah(index);
+                grid.appendChild(btn);
+            });
+        }
+
+        function setHarakat(h) {
+            playSoundEffect('pop');
+            state.currentHarakat = h;
+            ['fathah', 'kasrah', 'dammah'].forEach(type => {
+                const b = document.getElementById(`btn-harakat-${type}`);
+                if (b) {
+                    if ((type === 'fathah' && h === 'a') || (type === 'kasrah' && h === 'i') || (type === 'dammah' && h === 'u')) {
+                        b.className = 'px-3 py-1 rounded-xl bg-emerald-500 text-white shadow btn-bounce';
+                    } else {
+                        b.className = 'px-3 py-1 rounded-xl bg-slate-200 text-slate-600 btn-bounce';
+                    }
+                }
+            });
+            renderHijaiyahGrid();
+            updateHijaiyahDisplay();
+        }
+
+        function selectHijaiyah(index) {
+            playSoundEffect('pop');
+            state.currentHijaiyahIndex = index;
+            HIJAIYAH_DATA.forEach((_, i) => {
+                const b = document.getElementById(`hij-btn-${i}`);
+                if (b) {
+                    if (i === index) {
+                        b.className = 'p-2 font-arabic font-bold text-2xl rounded-xl border-2 transition btn-bounce bg-emerald-500 text-white border-emerald-600 shadow';
+                    } else {
+                        b.className = 'p-2 font-arabic font-bold text-2xl rounded-xl border-2 transition btn-bounce bg-slate-100 text-slate-700 border-slate-200 hover:bg-emerald-100';
+                    }
+                }
+            });
+            updateHijaiyahDisplay();
+        }
+
+        function updateHijaiyahDisplay() {
+            const data = HIJAIYAH_DATA[state.currentHijaiyahIndex];
+            const char = data.harakat[state.currentHarakat];
+            const latin = data.latin[state.currentHarakat];
+
+            document.getElementById('hijaiyah-big-display').innerText = char;
+            document.getElementById('hijaiyah-latin-name').innerText = `${data.name} (${latin})`;
+            document.getElementById('hijaiyah-example-word').innerText = data.example;
+
+            speakCurrentHijaiyah();
+        }
+
+        function speakCurrentHijaiyah() {
+            const data = HIJAIYAH_DATA[state.currentHijaiyahIndex];
+            const latin = data.latin[state.currentHarakat];
+            speakText(`${data.name}. Dibaca ${latin}`);
+        }
+
+        /* MODULE: DOA HARIAN */
+        function renderDoaList() {
+            const container = document.getElementById('doa-selector-list');
+            container.innerHTML = '';
+            DOA_DATA.forEach((doa, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap btn-bounce border transition ${index === 0 ? 'bg-teal-500 text-white border-teal-600 shadow' : 'bg-white text-slate-600 border-slate-200 hover:bg-teal-50'}`;
+                btn.id = `doa-btn-${index}`;
+                btn.innerHTML = `${doa.icon} ${doa.title}`;
+                btn.onclick = () => selectDoa(index);
+                container.appendChild(btn);
+            });
+            updateDoaDisplay();
+        }
+
+        function selectDoa(index) {
+            playSoundEffect('pop');
+            state.currentDoaIndex = index;
+            DOA_DATA.forEach((_, i) => {
+                const b = document.getElementById(`doa-btn-${i}`);
+                if (b) {
+                    if (i === index) {
+                        b.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap btn-bounce border bg-teal-500 text-white border-teal-600 shadow';
+                    } else {
+                        b.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap btn-bounce border bg-white text-slate-600 border-slate-200 hover:bg-teal-50';
+                    }
+                }
+            });
+            updateDoaDisplay();
+        }
+
+        function updateDoaDisplay() {
+            const doa = DOA_DATA[state.currentDoaIndex];
+            document.getElementById('doa-title').innerText = doa.title;
+            document.getElementById('doa-icon-display').innerText = doa.icon;
+            document.getElementById('doa-arabic').innerText = doa.arabic;
+            document.getElementById('doa-latin').innerText = `"${doa.latin}"`;
+            document.getElementById('doa-meaning').innerText = `"${doa.meaning}"`;
+            speakCurrentDoa();
+        }
+
+        function speakCurrentDoa() {
+            const doa = DOA_DATA[state.currentDoaIndex];
+            speakText(`${doa.title}. ${doa.meaning}`);
+        }
+
+        /* MODULE: RUKUN ISLAM & IMAN */
+        function switchRukunTab(type) {
+            playSoundEffect('pop');
+            const tabIslam = document.getElementById('tab-rukun-islam');
+            const tabIman = document.getElementById('tab-rukun-iman');
+
+            if (type === 'islam') {
+                tabIslam.className = 'flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce';
+                tabIman.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+            } else {
+                tabIman.className = 'flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce';
+                tabIslam.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+            }
+            renderRukunCards(type);
+        }
+
+        function renderRukunCards(type) {
+            const container = document.getElementById('rukun-cards-container');
+            container.innerHTML = '';
+            const list = type === 'islam' ? RUKUN_ISLAM : RUKUN_IMAN;
+
+            list.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border-2 border-amber-200 rounded-2xl p-3.5 shadow-sm flex items-start space-x-3 cursor-pointer btn-bounce';
+                card.onclick = () => {
+                    playSoundEffect('pop');
+                    speakText(`Rukun ${type === 'islam' ? 'Islam' : 'Iman'} ke ${item.num}: ${item.title}. ${item.desc}`);
+                };
+                card.innerHTML = `
+                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl text-amber-600 font-extrabold flex-shrink-0">
+                        ${item.icon}
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-extrabold text-slate-800">${item.num}. ${item.title}</h4>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">${item.desc}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        /* MODULE: WUDHU & SHALAT */
+        function switchIbadahTab(mode) {
+            playSoundEffect('pop');
+            state.currentIbadahMode = mode;
+            state.currentIbadahStep = 0;
+
+            const btnWudhu = document.getElementById('tab-ibadah-wudhu');
+            const btnShalat = document.getElementById('tab-ibadah-shalat');
+
+            if (mode === 'wudhu') {
+                btnWudhu.className = 'flex-1 py-2 rounded-xl bg-sky-500 text-white shadow btn-bounce';
+                btnShalat.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+                document.getElementById('ibadah-badge-title').innerText = 'Urutan Wudhu';
+            } else {
+                btnShalat.className = 'flex-1 py-2 rounded-xl bg-sky-500 text-white shadow btn-bounce';
+                btnWudhu.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+                document.getElementById('ibadah-badge-title').innerText = 'Gerakan Shalat';
+            }
+            updateIbadahStepDisplay();
+        }
+
+        function updateIbadahStepDisplay() {
+            const list = state.currentIbadahMode === 'wudhu' ? WUDHU_STEPS : SHALAT_STEPS;
+            const current = list[state.currentIbadahStep];
+
+            document.getElementById('ibadah-step-num').innerText = state.currentIbadahStep + 1;
+            document.getElementById('ibadah-total-steps').innerText = list.length;
+            document.getElementById('ibadah-visual-box').innerText = current.icon;
+            document.getElementById('ibadah-step-title').innerText = current.title;
+            document.getElementById('ibadah-step-desc').innerText = current.desc;
+
+            speakCurrentIbadahStep();
+        }
+
+        function nextIbadahStep() {
+            const list = state.currentIbadahMode === 'wudhu' ? WUDHU_STEPS : SHALAT_STEPS;
+            if (state.currentIbadahStep < list.length - 1) {
+                playSoundEffect('pop');
+                state.currentIbadahStep++;
+                updateIbadahStepDisplay();
+            }
+        }
+
+        function prevIbadahStep() {
+            if (state.currentIbadahStep > 0) {
+                playSoundEffect('pop');
+                state.currentIbadahStep--;
+                updateIbadahStepDisplay();
+            }
+        }
+
+        function speakCurrentIbadahStep() {
+            const list = state.currentIbadahMode === 'wudhu' ? WUDHU_STEPS : SHALAT_STEPS;
+            const current = list[state.currentIbadahStep];
+            speakText(`${current.title}. ${current.desc}`);
+        }
+
+        /* MODULE: GENERAL ALPHABET, NUMBERS, SHAPES & QUIZ */
+        function renderAlphabetGrid() {
+            const grid = document.getElementById('alphabet-grid');
+            grid.innerHTML = '';
+            ALPHABET_DATA.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-1.5 font-extrabold text-base rounded-xl border transition btn-bounce ${index === 0 ? 'bg-rose-500 text-white border-rose-600' : 'bg-slate-100 text-slate-700 border-slate-200'}`;
+                btn.id = `alpha-btn-${index}`;
+                btn.innerText = item.letter;
+                btn.onclick = () => selectAlphabet(index);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAlphabet(index) {
+            playSoundEffect('pop');
+            state.currentAlphaIndex = index;
+            ALPHABET_DATA.forEach((_, i) => {
+                const b = document.getElementById(`alpha-btn-${i}`);
+                if (b) {
+                    b.className = i === index ? 'p-1.5 font-extrabold text-base rounded-xl border transition btn-bounce bg-rose-500 text-white border-rose-600' : 'p-1.5 font-extrabold text-base rounded-xl border transition btn-bounce bg-slate-100 text-slate-700 border-slate-200';
+                }
+            });
+            updateAlphabetDisplay(index);
+        }
+
+        function updateAlphabetDisplay(index) {
+            const data = ALPHABET_DATA[index];
+            document.getElementById('alpha-big-letter').innerText = data.letter;
+            document.getElementById('alpha-word').innerText = data.word;
+            document.getElementById('alpha-emoji').innerText = data.emoji;
+            speakCurrentAlphabet();
+        }
+
+        function speakCurrentAlphabet() {
+            const data = ALPHABET_DATA[state.currentAlphaIndex];
+            speakText(`${data.letter}. ${data.word}`);
+        }
+
+        function renderNumbersGrid() {
+            const grid = document.getElementById('numbers-grid');
+            grid.innerHTML = '';
+            NUMBERS_DATA.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-1.5 font-extrabold text-sm rounded-xl border transition btn-bounce ${index === 0 ? 'bg-amber-500 text-white border-amber-600' : 'bg-slate-100 text-slate-700 border-slate-200'}`;
+                btn.id = `num-btn-${index}`;
+                btn.innerText = item.num;
+                btn.onclick = () => selectNumber(index);
+                grid.appendChild(btn);
+            });
+        }
+
+        function switchNumberTab(tab) {
+            playSoundEffect('pop');
+            const learnView = document.getElementById('subview-number-learn');
+            const countView = document.getElementById('subview-number-count');
+            const tabLearn = document.getElementById('tab-num-learn');
+            const tabCount = document.getElementById('tab-num-count');
+
+            if (tab === 'learn') {
+                learnView.classList.remove('hidden');
+                countView.classList.add('hidden');
+                tabLearn.className = 'flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce';
+                tabCount.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+            } else {
+                learnView.classList.add('hidden');
+                countView.classList.remove('hidden');
+                tabCount.className = 'flex-1 py-2 rounded-xl bg-amber-500 text-white shadow btn-bounce';
+                tabLearn.className = 'flex-1 py-2 rounded-xl text-slate-600 btn-bounce';
+            }
+        }
+
+        function selectNumber(index) {
+            playSoundEffect('pop');
+            state.currentNumberIndex = index;
+            NUMBERS_DATA.forEach((_, i) => {
+                const b = document.getElementById(`num-btn-${i}`);
+                if (b) {
+                    b.className = i === index ? 'p-1.5 font-extrabold text-sm rounded-xl border transition btn-bounce bg-amber-500 text-white border-amber-600' : 'p-1.5 font-extrabold text-sm rounded-xl border transition btn-bounce bg-slate-100 text-slate-700 border-slate-200';
+                }
+            });
+            updateNumberDisplay(index);
+        }
+
+        function updateNumberDisplay(index) {
+            const data = NUMBERS_DATA[index];
+            document.getElementById('number-big-display').innerText = data.num;
+            const objContainer = document.getElementById('number-objects-container');
+            objContainer.innerHTML = '';
+            for (let i = 0; i < data.num; i++) {
+                const span = document.createElement('span');
+                span.innerText = data.emoji;
+                objContainer.appendChild(span);
+            }
+            speakCurrentNumber();
+        }
+
+        function speakCurrentNumber() {
+            const data = NUMBERS_DATA[state.currentNumberIndex];
+            speakText(`${data.num}. ${data.name}`);
+        }
+
+        let currentCountAnswer = 0;
+        function generateCountGame() {
+            const container = document.getElementById('count-game-items');
+            const optionsContainer = document.getElementById('count-game-options');
+            container.innerHTML = '';
+            optionsContainer.innerHTML = '';
+
+            const count = Math.floor(Math.random() * 8) + 1;
+            currentCountAnswer = count;
+            const emojis = ['🍎', '🎈', '⭐', '🚗', '🍬'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+            for (let i = 0; i < count; i++) {
+                const item = document.createElement('div');
+                item.className = 'text-4xl cursor-pointer btn-bounce p-1';
+                item.innerText = randomEmoji;
+                item.onclick = () => playSoundEffect('pop');
+                container.appendChild(item);
+            }
+
+            let options = [count];
+            while (options.length < 3) {
+                let r = Math.floor(Math.random() * 8) + 1;
+                if (!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'w-12 h-12 bg-white border-2 border-amber-300 text-amber-600 font-extrabold text-xl rounded-xl shadow btn-bounce';
+                btn.innerText = opt;
+                btn.onclick = () => checkCountAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkCountAnswer(selected) {
+            if (selected === currentCountAnswer) {
+                playSoundEffect('correct');
+                speakText('Benar!');
+                addStars(2);
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+                setTimeout(generateCountGame, 1000);
+            } else {
+                playSoundEffect('wrong');
+                speakText('Coba lagi!');
+            }
+        }
+
+        function renderColorsAndShapes() {
+            const colorGrid = document.getElementById('colors-grid');
+            colorGrid.innerHTML = '';
+            COLORS_DATA.forEach(c => {
+                const card = document.createElement('div');
+                card.className = `${c.class} text-white font-extrabold p-3 rounded-xl shadow-sm cursor-pointer btn-bounce text-center text-xs flex items-center justify-center min-h-[50px]`;
+                card.onclick = () => { playSoundEffect('pop'); speakText(`Warna ${c.name}`); };
+                card.innerText = c.name;
+                colorGrid.appendChild(card);
+            });
+
+            const shapeGrid = document.getElementById('shapes-grid');
+            shapeGrid.innerHTML = '';
+            SHAPES_DATA.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-teal-200 p-3 rounded-xl shadow-sm flex flex-col items-center justify-center cursor-pointer btn-bounce text-center space-y-1';
+                card.onclick = () => { playSoundEffect('pop'); speakText(`Bentuk ${s.name}`); };
+                card.innerHTML = `${s.svg}<span class="text-xs font-bold text-slate-700">${s.name}</span>`;
+                shapeGrid.appendChild(card);
+            });
+        }
+
+        /* QUIZ ENGINE */
+        function startQuiz() {
+            state.quizIndex = 0;
+            state.quizScore = 0;
+            state.currentQuizQuestions = [...QUIZ_BANK].sort(() => Math.random() - 0.5);
+
+            document.getElementById('quiz-question-container').classList.remove('hidden');
+            document.getElementById('quiz-finish-box').classList.add('hidden');
+            document.getElementById('quiz-score').innerText = '0';
+
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            const q = state.currentQuizQuestions[state.quizIndex];
+            document.getElementById('quiz-step').innerText = state.quizIndex + 1;
+            document.getElementById('quiz-total').innerText = state.currentQuizQuestions.length;
+            document.getElementById('quiz-question-text').innerText = q.question;
+
+            const visualBox = document.getElementById('quiz-visual-box');
+            visualBox.innerHTML = `<span class="text-5xl font-extrabold text-purple-600">${q.hint}</span>`;
+
+            speakText(q.question);
+
+            const optsContainer = document.getElementById('quiz-options-container');
+            optsContainer.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 text-purple-800 font-extrabold text-sm py-3 rounded-xl shadow-sm btn-bounce';
+                btn.innerText = opt;
+                btn.onclick = () => answerQuiz(opt);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function answerQuiz(selected) {
+            const q = state.currentQuizQuestions[state.quizIndex];
+            if (selected === q.answer) {
+                playSoundEffect('correct');
+                speakText('Benar!');
+                state.quizScore += 20;
+                document.getElementById('quiz-score').innerText = state.quizScore;
+            } else {
+                playSoundEffect('wrong');
+                speakText(`Salah, Jawabannya ${q.answer}`);
+            }
+
+            state.quizIndex++;
+            if (state.quizIndex < state.currentQuizQuestions.length) {
+                setTimeout(showQuizQuestion, 1200);
+            } else {
+                setTimeout(finishQuiz, 1200);
+            }
+        }
+
+        function finishQuiz() {
+            playSoundEffect('correct');
+            document.getElementById('quiz-question-container').classList.add('hidden');
+            document.getElementById('quiz-finish-box').classList.remove('hidden');
+
+            const earnedStars = Math.max(1, Math.floor(state.quizScore / 10));
+            document.getElementById('quiz-reward-stars').innerText = earnedStars;
+            addStars(earnedStars);
+
+            confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+            speakText(`Hebat! Kamu mendapatkan ${earnedStars} bintang baru!`);
+        }
+
+        function restartQuiz() {
+            playSoundEffect('pop');
+            startQuiz();
+        }
+
+        /* PROFILE MODAL */
+        function updateProfileUI() {
+            document.getElementById('home-user-name').innerText = state.username;
+            document.getElementById('nav-avatar').innerText = state.avatar;
+            document.getElementById('hero-avatar-display').innerText = state.avatar;
+        }
+
+        function openProfileModal() {
+            playSoundEffect('pop');
+            document.getElementById('input-username').value = state.username;
+
+            const avatarContainer = document.getElementById('avatar-options');
+            avatarContainer.innerHTML = '';
+            AVATARS.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 rounded-xl border text-center btn-bounce ${state.avatar === emoji ? 'bg-indigo-100 border-indigo-500' : 'bg-slate-50 border-slate-200'}`;
+                btn.innerText = emoji;
+                btn.onclick = () => {
+                    playSoundEffect('pop');
+                    state.avatar = emoji;
+                    openProfileModal();
+                };
+                avatarContainer.appendChild(btn);
+            });
+
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            playSoundEffect('pop');
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        function saveProfile() {
+            playSoundEffect('pop');
+            const nameInput = document.getElementById('input-username').value.trim();
+            if (nameInput) {
+                state.username = nameInput;
+                localStorage.setItem('kidedu_name', state.username);
+            }
+            localStorage.setItem('kidedu_avatar', state.avatar);
+            updateProfileUI();
+            closeProfileModal();
+        }
+    </script>
+</body>
+</html>
